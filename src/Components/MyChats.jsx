@@ -19,8 +19,8 @@ const MyChats = ({ fetchAgain }) => {
     try {
       const config = {
         withCredentials: true,
-                credentials: 'include',
-      
+        credentials: 'include',
+
         headers: {
           Authorization: `Bearer ${user.token}`
         }

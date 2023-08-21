@@ -8,27 +8,24 @@ import UpdateGroupChatModal from './Miscellaneous/UpdateGroupChatModal';
 import axios from 'axios';
 import './styles.css'
 import ScrollableChat from './ScrollableChat';
-// import { Player } from '@lottiefiles/react-lottie-player';
 import animationData from "../Animations/Typing.json"
 import Lottie from 'lottie-react';
 import { BASE_URL } from '../config/Url';
 
 
 import io from 'socket.io-client';
-// const ENDPOINT = "http://localhost:5000";
-const ENDPOINT = "https://sayhiii.onrender.com";
+const ENDPOINT = `${BASE_URL}`;
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
-    // const [newMessage, setNewMessage] = useState("");
     const [socketConnected, setSocketConnected] = useState(false);
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
 
-    const { user, selectedChat, setSelectedChat,notification,setNotification,newMessage,setNewMessage } = ChatState();
+    const { user, selectedChat, setSelectedChat, notification, setNotification, newMessage, setNewMessage } = ChatState();
     const toast = useToast();
 
 
@@ -42,7 +39,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             const config = {
                 withCredentials: true,
                 credentials: 'include',
-                
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }
@@ -54,7 +50,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
             const { data } = await axios.get(`${BASE_URL}/api/message/${selectedChat._id}`, config);
 
-          
+
 
             setMessages(data);
             setLoading(false);
@@ -90,8 +86,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     useEffect(() => {
         socket.on("message received", (newMessageReceived) => {
             if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
-                if(!notification.includes(newMessageReceived)){
-                    setNotification([newMessageReceived,...notification]);
+                if (!notification.includes(newMessageReceived)) {
+                    setNotification([newMessageReceived, ...notification]);
                     setFetchAgain(!fetchAgain);
                 }
 
@@ -104,14 +100,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const sendMessage = async (event) => {
 
 
-        if (event.key === "Enter" && newMessage) {
+        if (event.key === "Enter" && newMessage || (event.type === 'click' && newMessage) ) {
 
             socket.emit('stop typing', selectedChat._id);
 
             try {
                 const config = {
                     withCredentials: true,
-                    credentials:true,
+                    credentials: true,
 
                     headers: {
                         "Content-Type": "application/json",
@@ -233,17 +229,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
 
-                                {isTyping ? <div style={{width:"60px",height:"50px"}} >
-                              
-                                    
+                                {isTyping ? <div style={{ width: "60px", height: "50px" }} >
+
+
                                     <Lottie
                                         animationData={animationData}
                                         width={70}
                                         style={{ marginBottom: 15, marginLeft: 0 }}
                                     />
                                 </div> : (<></>)}
-                                <Input variant={'filled'} bg={'#e0e0e0'} placeholder='Enter a message...' onChange={typingHandler} value={newMessage} />
-                                
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center", position:'relative'}}>
+                                    <Input variant={'filled'} bg={'#e0e0e0'} placeholder='Enter a message...' onChange={typingHandler} value={newMessage} />
+                                    <button onClick={sendMessage}>
+                                    <i style={{
+                                        position: 'absolute',
+                                        right: '10px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        cursor: 'pointer',
+                                        fontSize: "1.3rem"
+                                    }} className="fa-solid fa-paper-plane" 
+                                    ></i>
+                                    </button>
+                                   
+                                </div>
+
+
 
 
 
