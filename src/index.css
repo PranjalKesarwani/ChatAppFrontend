@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.App{
+ 
+    min-height: 100vh;
+    display: flex;
+    background-image: url('/images/background.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: black;
+    
+}
+
+::-webkit-scrollbar{
+    width: 0px;
+}
+
+::-webkit-scrollbar-thumb{
+    background: rgba(136, 136, 136, 0.281);
+}
+
+/* Handle on hover  */
+::-webkit-scrollbar-thumb:hover{
+    background: #555
+}
+
+.badge {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .badge-count {
+    position: absolute;
+    top: -4px;
+    right: 0px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    min-width: 14px;
+    min-height: 14px;
+    width: 18px;
+    height: 18px;
+    padding: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
