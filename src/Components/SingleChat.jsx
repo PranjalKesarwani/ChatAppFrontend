@@ -11,8 +11,6 @@ import ScrollableChat from './ScrollableChat';
 import animationData from "../Animations/Typing.json"
 import Lottie from 'lottie-react';
 import { BASE_URL } from '../config/Url';
-
-
 import io from 'socket.io-client';
 const ENDPOINT = `${BASE_URL}`;
 let socket, selectedChatCompare;
@@ -31,8 +29,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const fetchMessages = async () => {
         if (!selectedChat) return;
-
-
 
         try {
 
@@ -56,6 +52,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             setLoading(false);
 
             socket.emit('join chat', selectedChat._id);
+            //If you want to add a feature of showing online whether the user is online or not then do this: socket.on('room connected',()=>{setUserOnline(true)}), so in the backend after join chat connection write the socket.on and also if user left the room you also need to display user offline so when the user disconnected from the room there u also go and write the code
         } catch (error) {
             toast({
                 title: "Error Occured!",
@@ -74,7 +71,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.on('connected', () => { setSocketConnected(true) });
         socket.on('typing', () => setIsTyping(true));
         socket.on('stop typing', () => setIsTyping(false));
-
     }, []);
 
     useEffect(() => {
@@ -89,6 +85,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 if (!notification.includes(newMessageReceived)) {
                     setNotification([newMessageReceived, ...notification]);
                     setFetchAgain(!fetchAgain);
+                    //This is the place where you have to write the api for storing all the notifications in your server api, when you will open any specific chat then also you need an api for removing that message notification from that api
                 }
 
             } else {
@@ -121,7 +118,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 }, config);
 
-
+//Check here what is coming from the data
 
                 socket.emit('new message', data);
 
@@ -160,9 +157,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             if (timeDiff >= timerLength && typing) {
                 socket.emit('stop typing', selectedChat._id);
                 setTyping(false);
-
             }
-        }, timerLength)
+        }, timerLength);
 
     }
 
