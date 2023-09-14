@@ -19,6 +19,7 @@ const Signup = () => {
         email: "",
         password: "",
         confirmPassword: "",
+        pic:pic
     });
 
     const handleClick = () => {
@@ -51,8 +52,9 @@ const Signup = () => {
 
 
             }).then((res) => res.json()).then((data) => {
-                setPic(data.url.toString());
-                console.log(data.url.toString());
+                // setPic(data.url.toString());
+                console.log(data);
+                setForm({ ...form, pic:data.url.toString()})
                 setLoading(false);
             }).catch((err) => {
                 console.log(err);
@@ -187,7 +189,6 @@ const Signup = () => {
                         value={form.confirmPassword}
                         onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                         placeholder='Re-Enter Your Password'
-
                     />
                     <InputRightElement width={'4.5rem'}>
                         <Button h='1.75rem' size="sm" onClick={handleClick1}>
