@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../config/Url';
 
 const Signup = () => {
+
+
     const [show, setShow] = useState(false);
     const [show1, setShow1] = useState(false);
-    const [pic, setPic] = useState(false);
-    const [loading,setLoading] = useState(false);
+    const [pic, setPic] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
     const toast = useToast()
 
@@ -28,66 +30,66 @@ const Signup = () => {
 
     const postDetails = (pics) => {
         setLoading(true);
-        if(pics === undefined){
+        if (pics === undefined) {
             toast({
                 title: 'Please select an Image',
                 status: 'Warning',
                 duration: 4000,
                 isClosable: true,
-                position:bottom
-              });
-              return;
+                position: bottom
+            });
+            return;
         }
-        if(pics.type === "image/jpeg" || pics.type === "image/png"){
+        if (pics.type === "image/jpeg" || pics.type === "image/png") {
             const data = new FormData();  //Using FormData is important as it helps to read the image which are in binary form so for uploading pictures you have to use it
             data.append("file", pics);
-            data.append("upload_preset","chatApp");
-            data.append("cloud_name","dbyzki2cf");
-            fetch("https://api.cloudinary.com/v1_1/dbyzki2cf/image/upload",{     //yaha /image/upload likhna important 
-                method:"POST",
-                body:data,
-             
+            data.append("upload_preset", "chatApp");
+            data.append("cloud_name", "dbyzki2cf");
+            fetch("https://api.cloudinary.com/v1_1/dbyzki2cf/image/upload", {     //yaha /image/upload likhna important 
+                method: "POST",
+                body: data,
 
-            }).then((res)=>res.json()).then((data)=>{
+
+            }).then((res) => res.json()).then((data) => {
                 setPic(data.url.toString());
-                console.log(data);
+                console.log(data.url.toString());
                 setLoading(false);
-            }).catch((err)=>{
+            }).catch((err) => {
                 console.log(err);
                 setLoading(false);
             });
-        }else{
+        } else {
             toast({
                 title: 'Please select an Image',
                 status: 'warning',
                 duration: 4000,
                 isClosable: true,
-                position:bottom
-              });
-              setLoading(false);
-              return;
+                position: bottom
+            });
+            setLoading(false);
+            return;
         }
-            
+
     }
-    const submitHandler =async () => {
+    const submitHandler = async () => {
         setLoading(true);
 
-        if(!form.name || !form.email || !form.password || !form.confirmPassword){
+        if (!form.name || !form.email || !form.password || !form.confirmPassword) {
             toast({
-                title:"Please fill all the details",
+                title: "Please fill all the details",
                 status: "warning",
                 duration: 5000,
-                isClosable:true,
-                position:'bottom'
+                isClosable: true,
+                position: 'bottom'
             })
         }
-        if(form.password != form.confirmPassword){
+        if (form.password != form.confirmPassword) {
             toast({
-                title:"Passwords do not match",
+                title: "Passwords do not match",
                 status: "warning",
                 duration: 5000,
-                isClosable:true,
-                position:'bottom'
+                isClosable: true,
+                position: 'bottom'
             })
         }
 
@@ -95,19 +97,19 @@ const Signup = () => {
             const config = {
                 withCredentials: true,
                 credentials: 'include',
-                headers:{
-                    "Content-Type":"application/json"
+                headers: {
+                    "Content-Type": "application/json"
                 }
             }
 
-            const {data} = await axios.post(`${BASE_URL}/api/user`,form, config)
+            const { data } = await axios.post(`${BASE_URL}/api/user`, form, config)
 
             toast({
-                title:"Registration Successful!",
-                status:"success",
-                duration:5000,
-                isClosable:true,
-                position:"bottom"
+                title: "Registration Successful!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom"
             })
 
             localStorage.setItem("userInfo", JSON.stringify(data));
@@ -119,16 +121,16 @@ const Signup = () => {
 
         } catch (error) {
             toast({
-                title:"Error Occured!",
+                title: "Error Occured!",
                 description: error.response.data.message,
-                status:"failure",
-                duration:5000,
-                isClosable:true,
-                position:"bottom"
+                status: "failure",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom"
             })
         }
 
-        
+
 
     }
 
@@ -202,7 +204,7 @@ const Signup = () => {
                     p={1.5}
                     id="upload-picture"
                     accept="image/*"
-                    onChange={(e)=>postDetails(e.target.files[0])}
+                    onChange={(e) => postDetails(e.target.files[0])}
                 />
             </FormControl>
             <Button

@@ -22,9 +22,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [socketConnected, setSocketConnected] = useState(false);
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const [online,setOnline] = useState(false);
 
     const { user, selectedChat, setSelectedChat, notification, setNotification, newMessage, setNewMessage } = ChatState();
     const toast = useToast();
+    
 
 
     const fetchMessages = async () => {
@@ -51,7 +53,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             setMessages(data);
             setLoading(false);
 
-            socket.emit('join chat', selectedChat._id);
+            socket.emit('join chat', {chatId:selectedChat._id,isGroupChat:selectedChat.isGroupChat,userId:user._id});
             //If you want to add a feature of showing online whether the user is online or not then do this: socket.on('room connected',()=>{setUserOnline(true)}), so in the backend after join chat connection write the socket.on and also if user left the room you also need to display user offline so when the user disconnected from the room there u also go and write the code
         } catch (error) {
             toast({
@@ -68,7 +70,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     useEffect(() => {
         socket = io(ENDPOINT);
         socket.emit("setup", user);
-        socket.on('connected', () => { setSocketConnected(true) });
+        socket.on('connected', () => { setSocketConnected(true);setOnline(true);console.log('online') });
+        // socket.emit('disconnected',()=>{setOnline(false);console.log('offline')});
+        if(!socketConnected){
+            console.log('offline')
+        }
         socket.on('typing', () => setIsTyping(true));
         socket.on('stop typing', () => setIsTyping(false));
     }, []);
@@ -79,10 +85,43 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         selectedChatCompare = selectedChat;
     }, [selectedChat]);
 
+    // const saveNotifications = async (newMessageReceived) => {
+    //     const config = {
+    //         withCredentials: true,
+    //         credentials: true,
+
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             Authorization: `Bearer ${user.token}`
+    //         }
+    //     }
+    //     const { data } = await axios.post(`${BASE_URL}/api/notification`, newMessageReceived, config);
+    //     console.log(data);
+    // }
+
+    // const deBounce = function (newMessageReceived, d) {
+
+    //     let timer;
+    //     return function () {
+            
+    //         clearTimeout(timer);
+    //         console.log('called');
+    //         timer = setTimeout(() => {
+    //             saveNotifications(newMessageReceived);
+    //         }, d);
+    //     }
+
+    // }
+
+
     useEffect(() => {
         socket.on("message received", (newMessageReceived) => {
             if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
                 if (!notification.includes(newMessageReceived)) {
+
+                    // const debouncedSaveNotifications = deBounce(newMessageReceived, 1000);
+                    // debouncedSaveNotifications();   
+                                      // saveNotifications(newMessageReceived)
                     setNotification([newMessageReceived, ...notification]);
                     setFetchAgain(!fetchAgain);
                     //This is the place where you have to write the api for storing all the notifications in your server api, when you will open any specific chat then also you need an api for removing that message notification from that api
@@ -97,7 +136,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const sendMessage = async (event) => {
 
 
-        if (event.key === "Enter" && newMessage || (event.type === 'click' && newMessage) ) {
+        if (event.key === "Enter" && newMessage || (event.type === 'click' && newMessage)) {
 
             socket.emit('stop typing', selectedChat._id);
 
@@ -118,7 +157,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 }, config);
 
-//Check here what is coming from the data
+                //Check here what is coming from the data
 
                 socket.emit('new message', data);
 
@@ -189,6 +228,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                 !selectedChat.isGroupChat ? (
                                     <>
                                         {getSender(user, selectedChat.users)}
+                                         {online ? (<span>Online</span>) : <></>}
                                         <ProfileModal user={getSenderFull(user, selectedChat.users)} />
                                     </>
                                 ) : (
@@ -234,20 +274,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                         style={{ marginBottom: 15, marginLeft: 0 }}
                                     />
                                 </div> : (<></>)}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center", position:'relative'}}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center", position: 'relative' }}>
                                     <Input variant={'filled'} bg={'#e0e0e0'} placeholder='Enter a message...' onChange={typingHandler} value={newMessage} />
                                     <button onClick={sendMessage}>
-                                    <i style={{
-                                        position: 'absolute',
-                                        right: '10px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer',
-                                        fontSize: "1.3rem"
-                                    }} className="fa-solid fa-paper-plane" 
-                                    ></i>
+                                        <i style={{
+                                            position: 'absolute',
+                                            right: '10px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            cursor: 'pointer',
+                                            fontSize: "1.3rem"
+                                        }} className="fa-solid fa-paper-plane"
+                                        ></i>
                                     </button>
-                                   
+
                                 </div>
 
 
